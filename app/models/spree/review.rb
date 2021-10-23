@@ -32,5 +32,6 @@ class Spree::Review < ActiveRecord::Base
 
   def recalculate_product_rating
     product.recalculate_rating if product.present?
+    product.vendor.recalculate_rating
   end
 end
