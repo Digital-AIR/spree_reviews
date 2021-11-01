@@ -4,12 +4,14 @@ module Spree
       def initialize(scope:, params:)
         @scope = scope
         @products  = params.dig(:filter, :product_ids)&.split(',')
+        @slug_products  = params.dig(:filter, :product_slugs)&.split(',')
         @approved  = params.dig(:filter, :approved)
         @order  = params.dig(:filter, :order_by)        
       end
 
       def execute
         reviews = by_product(scope)
+        reviews = by_slug_product(reviews)
         reviews = by_approved(reviews)
         reviews = by_order(reviews)
 
@@ -18,8 +20,12 @@ module Spree
 
       private
 
-      attr_reader :products, :approved, :order, :scope
+      attr_reader :slug_products, :products, :approved, :order, :scope
 
+      def slug_products?
+        slug_products.present?
+      end
+      
       def products?
         products.present?
       end
@@ -30,6 +36,11 @@ module Spree
 
       def order?
         order.present?
+      end
+
+      def by_slug_product(reviews)
+        return reviews unless slug_products?
+        reviews.joins(:product).where(spree_products: {slug: slug_products})
       end
 
       def by_product(reviews)
