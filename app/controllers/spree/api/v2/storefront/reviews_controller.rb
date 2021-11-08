@@ -15,9 +15,9 @@ module Spree
 
         def create
           review = Spree::Review.new(review_params)
-          review.product = Spree::Product.find_by(id: params[:review][:product])
+          review.product = Spree::Product.find_by(slug: params[:review][:product])          
           if not review.product
-            review.product = Spree::Product.find_by(slug: params[:review][:product])
+            review.product = Spree::Product.find_by(id: params[:review][:product])
           end
           review.user = spree_current_user 
           review.ip_address = request.remote_ip
